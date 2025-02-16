@@ -1,90 +1,130 @@
 import java.util.Scanner;
 
-public class Student {
+class BankAccount {
+    String accountHolder;
+    int accountNumber;
+    double balance;
 
-static final int MAX_GRADES = 5;
-static int studentCount = 0;
-String name;
-int[] grades;
-int gradeCount;
-
-    public Student(String name) {
-        this.name = name;
-        this.grades = new int[MAX_GRADES];
-        this.gradeCount = 0;
-        studentCount++;
+    public BankAccount(String accountHolder, int accountNumber, double balance) {
+        this.accountHolder = accountHolder;
+        this.accountNumber = accountNumber;
+        this.balance = balance;
     }
 
-    public void addGrade(int grade) {
-        if (gradeCount < MAX_GRADES) {
-            grades[gradeCount] = grade;
-            gradeCount++;
+    public int getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            System.out.println("Deposited: $" + amount);
+            System.out.println("New Balance: $" + balance);
         } else {
-            System.out.println("Cannot add more than " + MAX_GRADES + " grades for " + name);
+            System.out.println("Invalid deposit amount.");
         }
     }
 
-    public double calculateAverage() {
-        if (gradeCount == 0) {
-            return 0.0;
+    public void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            System.out.println("Withdrawn: $" + amount);
+            System.out.println("New Balance: $" + balance);
+        } else {
+            System.out.println("Invalid withdrawal amount or insufficient funds.");
         }
-        int sum = 0;
-        int i = 0;
-        while (i < gradeCount) {
-            sum += grades[i];
-            i++;
-        }
-        return (double) sum / gradeCount;
     }
 
-    public void displayInfo() {
-        System.out.print("Student Name: " + name + "\nGrades: ");
-        int i = 0;
-        while (i < gradeCount) {
-            System.out.print(grades[i] + " ");
-            i++;
-        }
-        System.out.println("\nAverage Grade: " + calculateAverage());
+    public void displayAccountInfo() {
+        System.out.println("\nAccount Holder: " + accountHolder);
+        System.out.println("Account Number: " + accountNumber);
+        System.out.println("Current Balance: $" + balance);
     }
+}
 
-    public static int getStudentCount() {
-        return studentCount;
-    }
+public class BankAccount1 {
+    private static final String ADMIN_PASSWORD = "ahsan123";
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter number of students: ");
-        int numStudents = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print("Enter Admin Password: ");
+        String password = scanner.nextLine();
 
-        Student[] students = new Student[numStudents];
-
-        int i = 0;
-        while (i < numStudents) {
-            System.out.print("Enter name for student " + (i + 1) + ": ");
-            String name = scanner.nextLine();
-            students[i] = new Student(name);
-            
-            int j = 0;
-            while (j < MAX_GRADES) {
-                System.out.print("Enter grade " + (j + 1) + " for " + name + ": ");
-                int grade = scanner.nextInt();
-                students[i].addGrade(grade);
-                j++;
-            }
-            System.out.println("\n");
-            scanner.nextLine();
-            i++;
+        if (!password.equals(ADMIN_PASSWORD)) {
+            System.out.println("Incorrect password. Access denied.");
+            return;
         }
 
-        System.out.println("\nTotal students: " + Student.getStudentCount());
+        System.out.println("\nAdmin Access Granted\n");
 
-        i = 0;
-        while (i < students.length) {
-            students[i].displayInfo();
-            System.out.println();
-            i++;
+        System.out.print("Enter the number of accounts: ");
+        int numAccounts = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
+
+        BankAccount[] accounts = new BankAccount[numAccounts];
+
+        for (int i = 0; i < numAccounts; i++) {
+            System.out.println("\nEnter details for Account " + (i + 1) + ":");
+            System.out.print("Enter Account Holder Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Enter Account Number: ");
+            int accountNumber = scanner.nextInt();
+            System.out.print("Enter Initial Balance: ");
+            double balance = scanner.nextDouble();
+            scanner.nextLine(); // Consume newline
+
+            accounts[i] = new BankAccount(name, accountNumber, balance);
+        }
+
+        while (true) {
+            System.out.println("\nChoose an option:");
+            System.out.println("1. Deposit");
+            System.out.println("2. Withdraw");
+            System.out.println("3. Display Account Info");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            if (choice == 4) {
+                System.out.println("Exiting system. Goodbye!");
+                break;
+            }
+
+            System.out.print("Enter Account Number: ");
+            int accountNumber = scanner.nextInt();
+            BankAccount selectedAccount = null;
+
+            for (int i = 0; i < accounts.length; i++) {
+                if (accounts[i].getAccountNumber() == accountNumber) {
+                    selectedAccount = accounts[i];
+                    break;
+                }
+            }
+            
+
+            if (selectedAccount == null) {
+                System.out.println("Invalid Account Number.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter deposit amount: ");
+                    double depositAmount = scanner.nextDouble();
+                    selectedAccount.deposit(depositAmount);
+                    break;
+                case 2:
+                    System.out.print("Enter withdrawal amount: ");
+                    double withdrawAmount = scanner.nextDouble();
+                    selectedAccount.withdraw(withdrawAmount);
+                    break;
+                case 3:
+                    selectedAccount.displayAccountInfo();
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
         }
 
         scanner.close();
